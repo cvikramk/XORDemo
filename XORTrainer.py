@@ -53,11 +53,15 @@ class modelTrainer():
 	def saveModel(self,model_path):
 		torch.save(self.model.state_dict(), model_path)
 
+	def getModel(self):
+		return self.model
+
 
 if __name__ == '__main__':
 	XOR_Model = modelTrainer(epochs=2500)
 	XOR_Model.train()
-	example = [[0,1]]
+	example = torch.Tensor([0,1]).to('cuda')
+	model = XOR_Model.getModel()
 	traced_script_module = torch.jit.trace(model, example)
 	torchscript_model_optimized = optimize_for_mobile(traced_script_module)
 	torchscript_model_optimized.save("./xor_model.pt")
