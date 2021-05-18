@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+from torch.utils.mobile_optimizer import optimize_for_mobile
 import numpy as np
 
 from XORModel import XORNetwork
@@ -55,8 +55,12 @@ class modelTrainer():
 
 
 if __name__ == '__main__':
-	XOR_Model = modelTrainer(epochs=1500)
+	XOR_Model = modelTrainer(epochs=2500)
 	XOR_Model.train()
-	XOR_Model.saveModel('./xor_model.pt')
-	prediction = XOR_Model.inference([[0,1]])
-	print(prediction)
+	example = [[0,1]]
+	traced_script_module = torch.jit.trace(model, example)
+	torchscript_model_optimized = optimize_for_mobile(traced_script_module)
+	torchscript_model_optimized.save("./xor_model.pt")
+	# XOR_Model.saveModel('./xor_model.pt')
+	# prediction = XOR_Model.inference([[0,1]])
+	# print(prediction)
