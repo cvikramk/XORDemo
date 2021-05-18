@@ -14,7 +14,8 @@ train_labels = [0,1,1,0]
 
 class modelTrainer():
 	def __init__(self,epochs=1500,batch_size=4):
-		self.device = "cuda" if torch.cuda.is_available() else "cpu"
+		# self.device = "cuda" if torch.cuda.is_available() else "cpu"
+		self.device = "cpu"
 		self.model = XORNetwork().to(self.device)
 		self.loss_fn = nn.MSELoss()
 		self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.03,momentum=0.9)
@@ -60,11 +61,12 @@ class modelTrainer():
 if __name__ == '__main__':
 	XOR_Model = modelTrainer(epochs=2500)
 	XOR_Model.train()
-	example = torch.Tensor([0,1]).to('cuda')
+	example = torch.Tensor([0,1]).to('cpu')
 	model = XOR_Model.getModel()
 	traced_script_module = torch.jit.trace(model, example)
-	torchscript_model_optimized = optimize_for_mobile(traced_script_module)
-	torchscript_model_optimized.save("./xor_model.pt")
+	traced_script_module.save("./xor_model.pt")
+	# torchscript_model_optimized = optimize_for_mobile(traced_script_module)
+	# torchscript_model_optimized.save("./xor_model.pt")
 	# XOR_Model.saveModel('./xor_model.pt')
 	# prediction = XOR_Model.inference([[0,1]])
 	# print(prediction)
