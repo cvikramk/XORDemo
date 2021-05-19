@@ -12,7 +12,8 @@ train_data = [[0,0],
 train_labels = [0,1,1,0]
 
 class modelTrainer():
-	def __init__(self,epochs=1500,batch_size=4,device="cpu"):
+	def __init__(self,epochs=2500,batch_size=4,device="cpu"):
+		# Initialize various parameters
 		self.device = device
 		self.model = XORNetwork().to(self.device)
 		self.loss_fn = nn.MSELoss()
@@ -25,12 +26,14 @@ class modelTrainer():
 		self.iter_per_epoch = int(self.train_data_size/self.batch_size)
 
 	def getRandomBatch(self):
+		# Get a random batch from training data
 		randomIds = np.random.randint(0,self.train_data_size,self.batch_size)
 		randomX = self.X[randomIds]
 		randomY = self.y[randomIds]
 		return randomX,randomY
 		
 	def train(self):
+		# Train for given number of epochs
 		for i in range(self.epochs):
 			for _ in range(self.iter_per_epoch):
 				inp, target = self.getRandomBatch() 
@@ -43,6 +46,7 @@ class modelTrainer():
 				print("Epoch: {0}, Loss: {1}, ".format(i, loss.data.cpu().numpy()))
 
 	def inference(self,model_input):
+		# Run inference on given model input
 		self.model.eval()
 		with torch.no_grad():
 			model_input = torch.Tensor(model_input).to(self.device)
@@ -57,6 +61,6 @@ class modelTrainer():
 
 
 if __name__ == '__main__':
-	XOR_Model = modelTrainer(epochs=2500)
+	XOR_Model = modelTrainer()
 	XOR_Model.train()
 	XOR_Model.saveTracedModel("./model.pt")
