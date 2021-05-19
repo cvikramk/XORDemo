@@ -4,10 +4,11 @@ import numpy as np
 
 from XORModel import XORNetwork
 
+# Training data is the truth table for an XOR gate
 train_data = [[0,0],
-			  [1,0],
-			  [0,1],
-			  [1,1]]
+	  [1,0],
+	  [0,1],
+	  [1,1]]
 
 train_labels = [0,1,1,0]
 
