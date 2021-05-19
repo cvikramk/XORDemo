@@ -15,5 +15,5 @@ The PyTorch C++ library is available in [Cocoapods](https://cocoapods.org/), to 
 ```ruby
 pod install
 ```
-![Sample screenshot from app]<img src="(https://github.com/cvikramk/XORDemo/blob/main/screenshot.png" width="200"/>
+<img src="https://github.com/cvikramk/XORDemo/blob/main/screenshot.png" width="200"/>
 ![Sample screenshot from app](https://github.com/cvikramk/XORDemo/blob/main/screenshot.png | width=50)
