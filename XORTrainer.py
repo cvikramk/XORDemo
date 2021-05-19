@@ -1,21 +1,21 @@
 import torch
 import torch.nn as nn
-from torch.utils.mobile_optimizer import optimize_for_mobile
 import numpy as np
 
 from XORModel import XORNetwork
 
+# Training data is the truth table for an XOR gate
 train_data = [[0,0],
-			  [1,0],
-			  [0,1],
-			  [1,1]]
+	  [1,0],
+	  [0,1],
+	  [1,1]]
 
 train_labels = [0,1,1,0]
 
 class modelTrainer():
-	def __init__(self,epochs=1500,batch_size=4):
-		# self.device = "cuda" if torch.cuda.is_available() else "cpu"
-		self.device = "cpu"
+	def __init__(self,epochs=2500,batch_size=4,device="cpu"):
+		# Initialize various parameters
+		self.device = device
 		self.model = XORNetwork().to(self.device)
 		self.loss_fn = nn.MSELoss()
 		self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.03,momentum=0.9)
@@ -27,12 +27,14 @@ class modelTrainer():
 		self.iter_per_epoch = int(self.train_data_size/self.batch_size)
 
 	def getRandomBatch(self):
+		# Get a random batch from training data
 		randomIds = np.random.randint(0,self.train_data_size,self.batch_size)
 		randomX = self.X[randomIds]
 		randomY = self.y[randomIds]
 		return randomX,randomY
 		
 	def train(self):
+		# Train for given number of epochs
 		for i in range(self.epochs):
 			for _ in range(self.iter_per_epoch):
 				inp, target = self.getRandomBatch() 
@@ -45,28 +47,21 @@ class modelTrainer():
 				print("Epoch: {0}, Loss: {1}, ".format(i, loss.data.cpu().numpy()))
 
 	def inference(self,model_input):
+		# Run inference on given model input
 		self.model.eval()
 		with torch.no_grad():
 			model_input = torch.Tensor(model_input).to(self.device)
 			pred = self.model(model_input)
 			return [round(r) for r in pred.flatten().tolist()]
 
-	def saveModel(self,model_path):
-		torch.save(self.model.state_dict(), model_path)
+	def saveTracedModel(self,model_path):
+		example = torch.Tensor([0,1]).to('cpu')
+		traced_script_module = torch.jit.trace(self.model, example)
+		traced_script_module.save(model_path)
 
-	def getModel(self):
-		return self.model
 
 
 if __name__ == '__main__':
-	XOR_Model = modelTrainer(epochs=2500)
+	XOR_Model = modelTrainer()
 	XOR_Model.train()
-	example = torch.Tensor([0,1]).to('cpu')
-	model = XOR_Model.getModel()
-	traced_script_module = torch.jit.trace(model, example)
-	traced_script_module.save("./xor_model.pt")
-	# torchscript_model_optimized = optimize_for_mobile(traced_script_module)
-	# torchscript_model_optimized.save("./xor_model.pt")
-	# XOR_Model.saveModel('./xor_model.pt')
-	# prediction = XOR_Model.inference([[0,1]])
-	# print(prediction)
+	XOR_Model.saveTracedModel("./model.pt")
